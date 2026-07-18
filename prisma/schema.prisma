@@ -1,0 +1,100 @@
+// MediFlow database schema.
+// Docs: https://pris.ly/d/prisma-schema
+//
+// Models below cover Auth.js (NextAuth v5) plus a `password` field on User
+// so we can support email/password (Credentials) login today and drop in
+// OAuth providers later without a migration.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  // bcrypt hash of the user's password. Null for OAuth-only accounts.
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  assessments Assessment[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// A single record for every AI tool run (triage, scribe, medication check).
+// Inputs and structured AI outputs are stored as JSON so all three tools
+// share one table, one query path, and one unified history feed.
+model Assessment {
+  id          String         @id @default(cuid())
+  kind        AssessmentKind
+  userId      String
+  patientName String? // optional lightweight label, no separate Patient table
+  // `label` holds the headline result (urgency / risk level) for quick display
+  // and sorting the clinician queue without parsing the JSON.
+  label       String?
+  input       Json
+  result      Json
+  createdAt   DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, kind])
+}
+
+enum AssessmentKind {
+  TRIAGE
+  SCRIBE
+  MEDICATION
+}
