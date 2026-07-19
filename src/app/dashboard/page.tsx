@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { KIND_META, type AssessmentKind } from "@/lib/assessments";
+import { KIND_META, COPILOT_META, type AssessmentKind } from "@/lib/assessments";
 import { LevelBadge } from "@/components/level-badge";
 
 export default async function DashboardHome() {
@@ -53,9 +53,34 @@ export default async function DashboardHome() {
         </div>
       </section>
 
+      {/* Featured: Copilot */}
+      <section>
+        <Link
+          href={COPILOT_META.href}
+          className="group relative flex items-center gap-5 overflow-hidden rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white shadow-sm transition-all hover:shadow-md dark:border-brand-800"
+        >
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-3xl">
+            {COPILOT_META.emoji}
+          </span>
+          <div className="relative min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold">MediFlow {COPILOT_META.title}</h3>
+              <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                Agent
+              </span>
+            </div>
+            <p className="mt-0.5 text-sm text-brand-50/90">{COPILOT_META.blurb}</p>
+          </div>
+          <span className="relative hidden text-sm font-semibold sm:inline-flex sm:items-center sm:gap-1">
+            Open <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </span>
+        </Link>
+      </section>
+
       {/* Tools */}
       <section>
-        <h2 className="eyebrow">Tools</h2>
+        <h2 className="eyebrow">Individual tools</h2>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {(Object.keys(KIND_META) as AssessmentKind[]).map((kind) => {
             const meta = KIND_META[kind];

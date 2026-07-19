@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { KIND_META } from "@/lib/assessments";
+import { KIND_META, COPILOT_META } from "@/lib/assessments";
 
 const links = [
   { href: "/dashboard", label: "Overview", emoji: "🏠" },
+  { href: COPILOT_META.href, label: COPILOT_META.title, emoji: COPILOT_META.emoji },
   { href: KIND_META.TRIAGE.href, label: KIND_META.TRIAGE.title, emoji: KIND_META.TRIAGE.emoji },
   { href: KIND_META.SCRIBE.href, label: KIND_META.SCRIBE.title, emoji: KIND_META.SCRIBE.emoji },
   { href: KIND_META.MEDICATION.href, label: KIND_META.MEDICATION.title, emoji: KIND_META.MEDICATION.emoji },

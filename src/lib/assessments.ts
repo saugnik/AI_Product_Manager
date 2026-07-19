@@ -142,6 +142,15 @@ export const KIND_META: Record<
   },
 };
 
+// Copilot is an agent, not a stored assessment kind — kept separate from
+// KIND_META (which maps DB-persisted kinds).
+export const COPILOT_META = {
+  title: "Copilot",
+  blurb: "Describe a case in plain language — the agent picks the tools, runs them, and returns one action plan.",
+  href: "/dashboard/copilot",
+  emoji: "🤖",
+};
+
 // Tailwind classes for urgency / risk badges shared across the UI.
 export const LEVEL_STYLES: Record<string, string> = {
   EMERGENCY: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
