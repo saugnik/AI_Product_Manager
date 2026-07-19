@@ -5,9 +5,8 @@ import { useState } from "react";
 import type { MedicationResult } from "@/lib/assessments";
 import { LevelBadge } from "@/components/level-badge";
 import { Disclaimer } from "@/components/disclaimer";
-
-const inputCls =
-  "rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-100";
+import { Spinner } from "@/components/spinner";
+import { ToolHeader, ResultPlaceholder, Section } from "@/components/tool-ui";
 
 const SEVERITY_DOT: Record<string, string> = {
   high: "bg-red-500",
@@ -48,110 +47,77 @@ export default function MedicationsPage() {
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-          💊 Medication Safety
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          List the patient&apos;s medications (one per line). Get an interaction
-          and safety review with an overall risk level.
-        </p>
+        <ToolHeader
+          emoji="💊"
+          title="Medication Safety"
+          subtitle="List the patient's medications (one per line). Get an interaction and safety review with an overall risk level."
+        />
 
-        <form onSubmit={onSubmit} className="mt-5 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
+          <label className="mf-field">
             Patient (optional)
-            <input name="patientName" placeholder="Name" className={inputCls} />
+            <input name="patientName" placeholder="Name" className="mf-input" />
           </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label className="mf-field">
             Medications (one per line)
             <textarea
               name="medications"
               rows={6}
               placeholder={"warfarin\naspirin\nibuprofen"}
-              className={`resize-y ${inputCls}`}
+              className="mf-input resize-y"
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label className="mf-field">
             Conditions (optional)
-            <input
-              name="conditions"
-              placeholder="e.g. atrial fibrillation, CKD"
-              className={inputCls}
-            />
+            <input name="conditions" placeholder="e.g. atrial fibrillation, CKD" className="mf-input" />
           </label>
-          <button
-            type="submit"
-            disabled={pending}
-            className="h-11 rounded-full bg-zinc-900 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <button type="submit" disabled={pending} className="btn btn-primary h-11">
+            {pending && <Spinner />}
             {pending ? "Checking…" : "Check interactions"}
           </button>
-          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">{error}</p>}
         </form>
       </div>
 
       <div>
-        {!result && !pending && (
-          <div className="flex h-full min-h-48 items-center justify-center rounded-2xl border border-dashed border-zinc-300 p-6 text-center text-sm text-zinc-400 dark:border-zinc-700">
-            The safety review will appear here.
-          </div>
-        )}
+        {!result && <ResultPlaceholder pending={pending} label="safety review" />}
         {result && (
-          <div className="rounded-2xl border border-black/[.08] bg-white p-5 dark:border-white/[.145] dark:bg-zinc-950">
+          <div className="card p-6">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                Overall risk
-              </span>
+              <span className="eyebrow">Overall risk</span>
               <LevelBadge level={result.overallRisk} />
             </div>
 
-            <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Interactions
-            </h3>
-            {result.interactions.length === 0 ? (
-              <p className="mt-1 text-sm text-green-700 dark:text-green-400">
-                No significant interactions found.
-              </p>
-            ) : (
-              <ul className="mt-2 flex flex-col gap-3">
-                {result.interactions.map((it, i) => (
-                  <li
-                    key={i}
-                    className="rounded-lg border border-black/[.06] p-3 dark:border-white/[.08]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`h-2 w-2 rounded-full ${SEVERITY_DOT[it.severity] ?? "bg-zinc-400"}`}
-                        aria-hidden
-                      />
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                        {it.drugs.join(" + ")}
-                      </span>
-                      <span className="text-xs capitalize text-zinc-400">
-                        {it.severity}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 text-sm text-zinc-700 dark:text-zinc-300">
-                      {it.explanation}
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                      → {it.recommendation}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {result.warnings.length > 0 && (
-              <>
-                <h3 className="mt-5 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                  Other warnings
-                </h3>
-                <ul className="mt-1.5 list-inside list-disc text-sm text-zinc-800 dark:text-zinc-200">
-                  {result.warnings.map((w, i) => (
-                    <li key={i}>{w}</li>
+            <Section title="Interactions">
+              {result.interactions.length === 0 ? (
+                <p className="text-sm text-green-700 dark:text-green-400">
+                  No significant interactions found.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-3">
+                  {result.interactions.map((it, i) => (
+                    <li key={i} className="rounded-xl border border-zinc-100 p-3 dark:border-zinc-800/60">
+                      <div className="flex items-center gap-2">
+                        <span className={`h-2 w-2 rounded-full ${SEVERITY_DOT[it.severity] ?? "bg-zinc-400"}`} aria-hidden />
+                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                          {it.drugs.join(" + ")}
+                        </span>
+                        <span className="text-xs capitalize text-zinc-400">{it.severity}</span>
+                      </div>
+                      <p className="mt-1.5 text-sm text-zinc-700 dark:text-zinc-300">{it.explanation}</p>
+                      <p className="mt-1 text-sm font-medium text-brand-700 dark:text-brand-300">→ {it.recommendation}</p>
+                    </li>
                   ))}
                 </ul>
-              </>
+              )}
+            </Section>
+
+            {result.warnings.length > 0 && (
+              <Section title="Other warnings">
+                <ul className="list-inside list-disc text-sm text-zinc-800 dark:text-zinc-200">
+                  {result.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                </ul>
+              </Section>
             )}
 
             <Disclaimer text={result.disclaimer} />

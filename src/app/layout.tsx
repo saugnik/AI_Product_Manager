@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MediFlow",
-  description: "MediFlow — sign in to your account.",
+  title: "MediFlow — AI clinical assistant",
+  description:
+    "Triage symptoms, generate clinical notes, and check medication safety — AI decision support in one secure workspace.",
 };
 
 export default function RootLayout({

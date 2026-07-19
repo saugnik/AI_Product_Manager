@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------------------------------------------------------------------
+   MediFlow design tokens
+--------------------------------------------------------------------------- */
+@theme {
+  /* Brand: clinical teal */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: #f8fafb;
+  --foreground: #0f172a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #06090c;
+    --foreground: #e7edf3;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: color-mix(in oklab, currentColor 12%, transparent);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* App-wide soft background wash */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60rem 60rem at 110% -10%, color-mix(in oklab, var(--color-brand-500) 14%, transparent), transparent 60%),
+      radial-gradient(50rem 50rem at -10% 110%, color-mix(in oklab, var(--color-brand-400) 10%, transparent), transparent 55%);
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--color-brand-500) 30%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reusable component classes
+--------------------------------------------------------------------------- */
+@layer components {
+  .mf-field {
+    @apply flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300;
+  }
+  .mf-input {
+    @apply w-full rounded-xl border border-zinc-200 bg-white/80 px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-50 dark:placeholder:text-zinc-500;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply bg-brand-600 text-white shadow-sm shadow-brand-600/20 hover:bg-brand-700 hover:shadow-md hover:shadow-brand-600/25 active:scale-[.98];
+  }
+  .btn-ghost {
+    @apply border border-zinc-200 bg-white/70 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-200 dark:hover:bg-zinc-800/60;
+  }
+  .card {
+    @apply rounded-2xl border border-zinc-200/80 bg-white/85 shadow-sm backdrop-blur-sm dark:border-zinc-800/80 dark:bg-zinc-900/60;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500;
+  }
 }

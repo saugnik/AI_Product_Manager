@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
+import { Logo } from "@/components/logo";
+import { Spinner } from "@/components/spinner";
+import { AuthAside } from "@/components/auth-aside";
+
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +39,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Account created — sign the user straight in.
     const result = await signIn("credentials", {
       email: payload.email,
       password: payload.password,
@@ -43,83 +46,65 @@ export default function RegisterPage() {
     });
 
     setPending(false);
-
     if (result?.error) {
-      // Account exists but sign-in failed; send them to the login page.
       router.push("/login");
       return;
     }
-
     router.push("/dashboard");
     router.refresh();
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4 py-16 dark:bg-black">
-      <div className="w-full max-w-sm rounded-2xl border border-black/[.08] bg-white p-8 shadow-sm dark:border-white/[.145] dark:bg-zinc-950">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Create your account
-        </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Get started with MediFlow in a few seconds.
-        </p>
+    <div className="grid flex-1 lg:grid-cols-2">
+      <AuthAside />
+      <div className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden">
+            <Logo />
+          </div>
+          <h1 className="mt-8 text-2xl font-bold tracking-tight text-zinc-900 lg:mt-0 dark:text-zinc-50">
+            Create your account
+          </h1>
+          <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+            Get started with MediFlow in seconds.
+          </p>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Name
-            <input
-              name="name"
-              type="text"
-              required
-              autoComplete="name"
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-100"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Email
-            <input
-              name="email"
-              type="email"
-              required
-              autoComplete="email"
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-100"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Password
-            <input
-              name="password"
-              type="password"
-              required
-              autoComplete="new-password"
-              className="rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-100"
-            />
-            <span className="text-xs font-normal text-zinc-400">
-              At least 8 characters, with a letter and a number.
-            </span>
-          </label>
+          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+            <label className="mf-field">
+              Name
+              <input name="name" type="text" required autoComplete="name" className="mf-input" placeholder="Dr. Jane Doe" />
+            </label>
+            <label className="mf-field">
+              Email
+              <input name="email" type="email" required autoComplete="email" className="mf-input" placeholder="you@clinic.com" />
+            </label>
+            <label className="mf-field">
+              Password
+              <input name="password" type="password" required autoComplete="new-password" className="mf-input" placeholder="••••••••" />
+              <span className="text-xs font-normal text-zinc-400">
+                At least 8 characters, with a letter and a number.
+              </span>
+            </label>
 
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-              {error}
-            </p>
-          )}
+            {error && (
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400" role="alert">
+                {error}
+              </p>
+            )}
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="mt-2 h-11 rounded-full bg-zinc-900 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            {pending ? "Creating account…" : "Create account"}
-          </button>
-        </form>
+            <button type="submit" disabled={pending} className="btn btn-primary mt-1 h-11">
+              {pending && <Spinner />}
+              {pending ? "Creating account…" : "Create account"}
+            </button>
+          </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-zinc-900 underline dark:text-zinc-50">
-            Sign in
-          </Link>
-        </p>
+          <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            Already have an account?{" "}
+            <Link href="/login" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

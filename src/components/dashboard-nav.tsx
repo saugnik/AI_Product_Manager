@@ -28,8 +28,8 @@ export function DashboardNav() {
             href={link.href}
             className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               active
-                ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
-                : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+                ? "bg-brand-600 text-white shadow-sm shadow-brand-600/25"
+                : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/70"
             }`}
           >
             <span aria-hidden>{link.emoji}</span>
